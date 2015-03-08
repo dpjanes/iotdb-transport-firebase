@@ -6,6 +6,7 @@
  *  2015-03-07
  *
  *  Demonstrate sending something
+ *  Make sure to see README first
  */
 
 var FirebaseTransport = require('../FirebaseTransport').FirebaseTransport;
@@ -14,6 +15,6 @@ var p = new FirebaseTransport();
 var tmeta = p.connect("MyThingID", "meta");
 tmeta.send({
     first: "David",
-    last: "Janes 111",
+    last: "Janes",
     now: (new Date()).toISOString(),
 });

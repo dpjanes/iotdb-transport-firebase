@@ -6,6 +6,7 @@
  *  2015-03-07
  *
  *  Demonstrate receiving
+ *  Make sure to see README first
  */
 
 var FirebaseTransport = require('../FirebaseTransport').FirebaseTransport;

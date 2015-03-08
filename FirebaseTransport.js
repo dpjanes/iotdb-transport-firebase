@@ -26,7 +26,6 @@ var bunyan = iotdb.bunyan;
 
 var firebase = require('firebase');
 
-var events = require('events');
 var util = require('util');
 
 var logger = bunyan.createLogger({
@@ -46,12 +45,7 @@ var FirebaseTransport = function (initd) {
     );
 
     self.native = new firebase(self.initd.host);
-
-    events.EventEmitter.call(this);
-    this.setMaxListeners(0);
 };
-
-util.inherits(FirebaseTransport, events.EventEmitter);
 
 /**
  */
@@ -71,13 +65,6 @@ FirebaseTransport.prototype.connect = function (thing_id, band) {
             });
         },
     };
-};
-
-/**
- */
-FirebaseTransport.prototype.send = function (paramd) {
-    var self = this;
-
 };
 
 /**
