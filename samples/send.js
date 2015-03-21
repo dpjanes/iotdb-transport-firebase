@@ -13,7 +13,7 @@ var FirebaseTransport = require('../FirebaseTransport').FirebaseTransport;
 
 var p = new FirebaseTransport();
 var tmeta = p.connect("MyThingID", "meta");
-tmeta.send({
+tmeta.update({
     first: "David",
     last: "Janes",
     now: (new Date()).toISOString(),

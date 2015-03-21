@@ -5,7 +5,8 @@
     }, 
     "dependencies": {
         "firebase": "~2.2.2", 
-        "iotdb": ">=0.5.3"
+        "iotdb": ">=0.5.3", 
+        "validate": "~2.1.6"
     }, 
     "description": "HomeStar / IOTDB Bridge for Firebase", 
     "devDependencies": {
