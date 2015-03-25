@@ -11,10 +11,18 @@
 
 var FirebaseTransport = require('../FirebaseTransport').FirebaseTransport;
 
-var p = new FirebaseTransport();
-var tmeta = p.connect("MyThingID", "meta");
-tmeta.update({
-    first: "David",
-    last: "Janes",
-    now: (new Date()).toISOString(),
+var p = new FirebaseTransport({
+    prefix: "/samples/",
 });
+
+var _update = function() {
+    p.update("MyThingID", "meta", {
+        first: "David",
+        last: "Janes",
+        now: (new Date()).toISOString(),
+    });
+};
+
+
+setInterval(_update, 10 * 1000);
+_update();

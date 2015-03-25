@@ -12,8 +12,9 @@
 var FirebaseTransport = require('../FirebaseTransport').FirebaseTransport;
 
 var p = new FirebaseTransport({
-    prefix: "/samples/",
+    xprefix: "/samples/",
+    prefix: "/76ca1468-7ebe-46d5-890f-315cb1ecf315/homestar/",
 });
-p.updated("MyThingID", "meta", function(id, band, value) {
-    console.log("+", id, band, value);
+p.list(function(ids) {
+    console.log(ids);
 });

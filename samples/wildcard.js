@@ -14,6 +14,9 @@ var FirebaseTransport = require('../FirebaseTransport').FirebaseTransport;
 var p = new FirebaseTransport({
     prefix: "/samples/",
 });
-p.updated("MyThingID", "meta", function(id, band, value) {
-    console.log("+", id, band, value);
+p.get("MyThingID", "meta", function(id, band, value) {
+    console.log("+", "get", id, band, value);
+});
+p.updated(function(id, band, value) {
+    console.log("+", "updated", id, band, value);
 });

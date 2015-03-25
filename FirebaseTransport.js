@@ -27,28 +27,14 @@ var _ = iotdb._;
 var bunyan = iotdb.bunyan;
 
 var firebase = require('firebase');
-var validate = require('validate');
 
 var util = require('util');
+var url = require('url');
 
 var logger = bunyan.createLogger({
     name: 'iotdb-transport-firebase',
     module: 'FirebaseTransport',
 });
-
-var _validate_initd = validate({}, {
-    typecast: true,
-    scrub: false
-});
-_validate_initd
-    .path("host")
-    .type("string")
-    .required(true)
-    .message("'host' is required");
-_validate_initd
-    .path("channel_prefix")
-    .type("string")
-    .required(false);
 
 /**
  *  Create a transport for FireBase.
@@ -56,78 +42,154 @@ _validate_initd
 var FirebaseTransport = function (initd) {
     var self = this;
 
-    self.initd = _.defaults(initd,
+    self.initd = _.defaults(
+        initd,
         iotdb.keystore().get("/transports/FirebaseTransport/initd"),
         {
-            channel_prefix: "/",
+            prefix: "/",
             host: null
         }
     );
 
-    var errors = _validate_initd.validate(self.initd);
-    if (errors.length) {
-        console.log("ERRORS", errors);
-        throw errors[0];
-    }
+    self.initd.parts = _split(self.initd.prefix);
 
     self.native = new firebase(self.initd.host);
 };
 
-var _validate_connect = validate({}, {
-    typecast: true,
-    scrub: false
-});
-_validate_connect
-    .path("id")
-    .type("string")
-    .required(true)
-    .message("'id' is required");
-_validate_connect
-    .path("band")
-    .type("string")
-    .required(true)
-    .message("'band' is required");
-_validate_initd
-    .path("channel_prefix")
-    .type("string")
-    .required(false);
-
 /**
- *  Returns an object with two functions:
- *  - send(message): send a message on id/band
- *  - on_update: on changes to id/band, call the callback.
  */
-FirebaseTransport.prototype.connect = function (id, band, paramd) {
+FirebaseTransport.prototype.list = function(paramd, callback) {
     var self = this;
 
-    paramd = _.defaults(paramd, self.initd, {});
-
-    var errors = _validate_connect.validate({ id: id, band: band });
-    if (errors.length) {
-        throw errors[0];
+    if (arguments.length === 1) {
+        paramd = {};
+        callback = arguments[0];
     }
 
-    var firebase_channel = util.format("%s/%s/%s", paramd.channel_prefix, _encode(id), band);
+    var channel = self._channel();
+    self.native.child(channel).orderByKey().on("child_added", function(snapshot) {
+        callback([ snapshot.key(), ]);
+    });
+};
 
-    return {
-        update: function (messaged) {
-            self.native.child(firebase_channel).set(_pack_out(messaged));
-        },
+/**
+ */
+FirebaseTransport.prototype.get = function(id, band, callback) {
+    var self = this;
 
-        on_update: function (callback) {
-            self.native.child(firebase_channel).on("value", function (snapshot) {
-                callback(_pack_in(snapshot.val()));
-            });
-        },
-    };
+    if (!id) {
+        throw new Error("id is required");
+    }
+    if (!band) {
+        throw new Error("band is required");
+    }
+
+    var channel = self._channel(id, band);
+    self.native.child(channel).once("value", function(snapshot) {
+        callback(id, band, _pack_in(snapshot.val()));
+    });
+};
+
+/**
+ */
+FirebaseTransport.prototype.update = function(id, band, value) {
+    var self = this;
+
+    if (!id) {
+        throw new Error("id is required");
+    }
+    if (!band) {
+        throw new Error("band is required");
+    }
+
+    var channel = self._channel(id, band);
+    var d = _pack_out(value);
+
+    self.native.child(channel).set(d);
+};
+
+/**
+ */
+FirebaseTransport.prototype.updated = function(id, band, callback) {
+    var self = this;
+
+    if (arguments.length === 1) {
+        id = null;
+        band = null;
+        callback = arguments[0];
+    } else if (arguments.length === 2) {
+        band = null;
+        callback = arguments[1];
+    }
+
+    var channel = self._channel(id, band);
+    self.native.child(channel).on("child_changed", function (snapshot, name) {
+        var snapshot_url = snapshot.ref().toString();
+        var snapshot_path = url.parse(snapshot_url).path;
+        var snapshot_parts = _split(snapshot_path);
+        
+        var parts = self.initd.parts;
+        var diff = snapshot_parts.length - parts.length;
+        if (diff > 2) {
+            var snapshot_id = _decode(snapshot_parts[parts.length]);
+            var snapshot_band = _decode(snapshot_parts[parts.length + 1]);
+            var snapshot_value = undefined;
+            callback(snapshot_id, snapshot_band, snapshot_value);
+        } else if (diff === 2) {
+            var snapshot_id = _decode(snapshot_parts[parts.length]);
+            var snapshot_band = _decode(snapshot_parts[parts.length + 1]);
+            var snapshot_value = _pack_in(snapshot.val());
+            callback(snapshot_id, snapshot_band, snapshot_value);
+        } else if (diff === 1) {
+            var snapshot_id = _decode(snapshot_parts[parts.length]);
+            var d = _pack_in(snapshot.val());
+            for (var snapshot_band in d) {
+                var snapshot_value = d[snapshot_band];
+                callback(snapshot_id, snapshot_band, snapshot_value);
+            }
+        } else {
+            /* ignoring massive udpates */
+        }
+    });
+};
+
+/**
+ */
+FirebaseTransport.prototype.remove = function(id, band) {
+    var self = this;
+
+    if (!id) {
+        throw new Error("id is required");
+    }
+
+    var channel = self._channel(id, band);
+    self.native.child(channel).remove();
 };
 
 /* -- internals -- */
+FirebaseTransport.prototype._channel = function(id, band) {
+    var self = this;
+
+    var parts = _.deepCopy(self.initd.parts);
+    if (id) {
+        parts.push(_encode(id));
+    }
+    if (band) {
+        parts.push(_encode(band));
+    }
+
+    return parts.join("/");
+};
+
 var _encode = function(s) {
-    return s.replace(/[\/#.]/g, function(c) {
+    return s.replace(/[\/$#.\]\[]/g, function(c) {
         return '%' + c.charCodeAt(0).toString(16);
     });
 };
+
+var _decode = function(s) {
+    return decodeURIComponent(s);
+}
 
 var _pack_out = function(d) {
     var outd = {};
@@ -143,18 +205,42 @@ var _pack_out = function(d) {
     return outd;
 };
 
+/* this should be made recursive */
 var _pack_in = function(d) {
     var ind = {};
 
     for (var key in d) {
         var value = d[key];
-        ind[decodeURIComponent(key)] = value;
+        ind[_decode(key)] = value;
     }
 
     return ind;
 };
 
+var _split = function(path) {
+    var nparts = [];
+    var oparts = path.split("/");
+
+    for (var pi in oparts) {
+        var part = oparts[pi];
+        if (part.length > 0) {
+            nparts.push(part);
+        }
+    }
+
+    return nparts;
+}
+
 /**
  *  API
  */
 exports.FirebaseTransport = FirebaseTransport;
+
+/*
+var t = new FirebaseTransport({
+    prefix: "sample"
+});
+console.log(t.initd)
+
+t.update("MyThing", "istate", { name: "hi" });
+ */

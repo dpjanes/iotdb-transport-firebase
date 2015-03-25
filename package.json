@@ -4,8 +4,8 @@
         "url": "https://github.com/dpjanes/iotdb-transport-firebase/issues"
     }, 
     "dependencies": {
-        "firebase": "~2.2.2", 
-        "iotdb": ">=0.5.3", 
+        "firebase": "~2.2.3", 
+        "iotdb": ">=0.5.8", 
         "validate": "~2.1.6"
     }, 
     "description": "HomeStar / IOTDB Bridge for Firebase", 
@@ -33,5 +33,5 @@
     "scripts": {
         "test": "grunt"
     }, 
-    "version": "0.0.2"
+    "version": "0.0.4"
 }

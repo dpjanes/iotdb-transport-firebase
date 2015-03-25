@@ -6,7 +6,7 @@
 #   2015-03-08
 #
 
-PACKAGE=iotdb-transport-firebaee
+PACKAGE=iotdb-transport-firebase
 DIST_ROOT=/var/tmp/.dist.$$
 
 if [ ! -d "$DIST_ROOT" ]
@@ -33,7 +33,7 @@ echo "=================="
         --exclude "node_modules" \
         README.md LICENSE \
         homestar.json package.json \
-        *.js \
+        index.js FirebaseTransport.js \
         |
     ( cd "${NPM_DST}" && tar xvf - )
 
