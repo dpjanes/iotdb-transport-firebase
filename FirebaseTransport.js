@@ -57,6 +57,14 @@ var FirebaseTransport = function (initd) {
 };
 
 /**
+ *  List all the IDs associated with this Transport.
+ *
+ *  The callback is called with a list of IDs
+ *  and then null when there are no further values.
+ *
+ *  Note that this may not be memory efficient due
+ *  to the way "value" works. This could be revisited
+ *  in the future.
  */
 FirebaseTransport.prototype.list = function(paramd, callback) {
     var self = this;
@@ -67,9 +75,16 @@ FirebaseTransport.prototype.list = function(paramd, callback) {
     }
 
     var channel = self._channel();
-    self.native.child(channel).orderByKey().on("child_added", function(snapshot) {
-        callback([ snapshot.key(), ]);
-    });
+    self.native
+        .child(channel)
+        .orderByKey()
+        .on("value", function(parent_snapshot) {
+            parent_snapshot.forEach(function(snapshot) {
+                callback([ _decode(snapshot.key()), ]);
+            });
+            callback(null);
+        });
+
 };
 
 /**
@@ -86,7 +101,8 @@ FirebaseTransport.prototype.get = function(id, band, callback) {
 
     var channel = self._channel(id, band);
     self.native.child(channel).once("value", function(snapshot) {
-        callback(id, band, _pack_in(snapshot.val()));
+        // console.log("HERE:AAA", channel, id, band, snapshot.val(), snapshot);
+        callback(id, band, _unpack(snapshot.val()));
     });
 };
 
@@ -103,7 +119,7 @@ FirebaseTransport.prototype.update = function(id, band, value) {
     }
 
     var channel = self._channel(id, band);
-    var d = _pack_out(value);
+    var d = _pack(value);
 
     self.native.child(channel).set(d);
 };
@@ -127,6 +143,8 @@ FirebaseTransport.prototype.updated = function(id, band, callback) {
         var snapshot_url = snapshot.ref().toString();
         var snapshot_path = url.parse(snapshot_url).path;
         var snapshot_parts = _split(snapshot_path);
+
+        console.log("UPDATED");
         
         var parts = self.initd.parts;
         var diff = snapshot_parts.length - parts.length;
@@ -138,11 +156,11 @@ FirebaseTransport.prototype.updated = function(id, band, callback) {
         } else if (diff === 2) {
             var snapshot_id = _decode(snapshot_parts[parts.length]);
             var snapshot_band = _decode(snapshot_parts[parts.length + 1]);
-            var snapshot_value = _pack_in(snapshot.val());
+            var snapshot_value = _unpack(snapshot.val());
             callback(snapshot_id, snapshot_band, snapshot_value);
         } else if (diff === 1) {
             var snapshot_id = _decode(snapshot_parts[parts.length]);
-            var d = _pack_in(snapshot.val());
+            var d = _unpack(snapshot.val());
             for (var snapshot_band in d) {
                 var snapshot_value = d[snapshot_band];
                 callback(snapshot_id, snapshot_band, snapshot_value);
@@ -173,16 +191,17 @@ FirebaseTransport.prototype._channel = function(id, band) {
     var parts = _.deepCopy(self.initd.parts);
     if (id) {
         parts.push(_encode(id));
-    }
-    if (band) {
-        parts.push(_encode(band));
+
+        if (band) {
+            parts.push(_encode(band));
+        }
     }
 
     return parts.join("/");
 };
 
 var _encode = function(s) {
-    return s.replace(/[\/$#.\]\[]/g, function(c) {
+    return s.replace(/[\/$%#.\]\[]/g, function(c) {
         return '%' + c.charCodeAt(0).toString(16);
     });
 };
@@ -191,30 +210,18 @@ var _decode = function(s) {
     return decodeURIComponent(s);
 }
 
-var _pack_out = function(d) {
-    var outd = {};
-    var d = _.ld.compact(d);
-
-    for (var key in d) {
-        var value = d[key];
-        var okey = _encode(key);
-
-        outd[okey] = value;
-    }
-
-    return outd;
+var _unpack = function(d) {
+    return _.d.transform(d, {
+        pre: _.ld_compact,
+        key: _decode,
+    });
 };
 
-/* this should be made recursive */
-var _pack_in = function(d) {
-    var ind = {};
-
-    for (var key in d) {
-        var value = d[key];
-        ind[_decode(key)] = value;
-    }
-
-    return ind;
+var _pack = function(d) {
+    return _.d.transform(d, {
+        pre: _.ld_compact,
+        key: _encode,
+    });
 };
 
 var _split = function(path) {
@@ -235,12 +242,3 @@ var _split = function(path) {
  *  API
  */
 exports.FirebaseTransport = FirebaseTransport;
-
-/*
-var t = new FirebaseTransport({
-    prefix: "sample"
-});
-console.log(t.initd)
-
-t.update("MyThing", "istate", { name: "hi" });
- */
