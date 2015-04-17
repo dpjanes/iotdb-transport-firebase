@@ -1,6 +1,9 @@
 # iotdb-transport-firebase
 IOTDB / HomeStar Transport for Firebase
 
+See:
+* https://github.com/dpjanes/iotdb-homestar/blob/master/docs/transports.md
+
 ## Setting up
 
 ### Add to IOTDB

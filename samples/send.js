@@ -16,10 +16,13 @@ var p = new FirebaseTransport({
 });
 
 var _update = function() {
+    var when = (new Date()).toISOString();
+
+    console.log("+", "send", when);
     p.update("MyThingID", "meta", {
         first: "David",
         last: "Janes",
-        now: (new Date()).toISOString(),
+        now: when,
     });
 };
 

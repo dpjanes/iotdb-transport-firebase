@@ -36,8 +36,10 @@ var logger = bunyan.createLogger({
     module: 'FirebaseTransport',
 });
 
+/* --- constructor --- */
+
 /**
- *  Create a transport for FireBase.
+ *  See {iotdb.transporter.Transport#Transport} for documentation.
  */
 var FirebaseTransport = function (initd) {
     var self = this;
@@ -56,12 +58,11 @@ var FirebaseTransport = function (initd) {
     self.native = new firebase(self.initd.host);
 };
 
+FirebaseTransport.prototype = new iotdb.transporter.Transport;
+
 /**
- *  List all the IDs associated with this Transport.
- *
- *  The callback is called with a list of IDs
- *  and then null when there are no further values.
- *
+ *  See {iotdb.transporter.Transport#list} for documentation.
+ *  <p>
  *  Note that this may not be memory efficient due
  *  to the way "value" works. This could be revisited
  *  in the future.
@@ -80,7 +81,7 @@ FirebaseTransport.prototype.list = function(paramd, callback) {
         .orderByKey()
         .on("value", function(parent_snapshot) {
             parent_snapshot.forEach(function(snapshot) {
-                callback([ _decode(snapshot.key()), ]);
+                callback(_decode(snapshot.key()));
             });
             callback(null);
         });
@@ -88,6 +89,23 @@ FirebaseTransport.prototype.list = function(paramd, callback) {
 };
 
 /**
+ *  See {iotdb.transporter.Transport#added} for documentation.
+ *  <p>
+ *  NOT FINISHED
+ */
+FirebaseTransport.prototype.added = function(paramd, callback) {
+    var self = this;
+
+    if (arguments.length === 1) {
+        paramd = {};
+        callback = arguments[0];
+    }
+
+    var channel = self._channel();
+};
+
+/**
+ *  See {iotdb.transporter.Transport#get} for documentation.
  */
 FirebaseTransport.prototype.get = function(id, band, callback) {
     var self = this;
@@ -107,6 +125,7 @@ FirebaseTransport.prototype.get = function(id, band, callback) {
 };
 
 /**
+ *  See {iotdb.transporter.Transport#update} for documentation.
  */
 FirebaseTransport.prototype.update = function(id, band, value) {
     var self = this;
@@ -125,6 +144,7 @@ FirebaseTransport.prototype.update = function(id, band, value) {
 };
 
 /**
+ *  See {iotdb.transporter.Transport#updated} for documentation.
  */
 FirebaseTransport.prototype.updated = function(id, band, callback) {
     var self = this;
@@ -144,8 +164,6 @@ FirebaseTransport.prototype.updated = function(id, band, callback) {
         var snapshot_path = url.parse(snapshot_url).path;
         var snapshot_parts = _split(snapshot_path);
 
-        console.log("UPDATED");
-        
         var parts = self.initd.parts;
         var diff = snapshot_parts.length - parts.length;
         if (diff > 2) {
@@ -172,8 +190,9 @@ FirebaseTransport.prototype.updated = function(id, band, callback) {
 };
 
 /**
+ *  See {iotdb.transporter.Transport#remove} for documentation.
  */
-FirebaseTransport.prototype.remove = function(id, band) {
+FirebaseTransport.prototype.remove = function(id) {
     var self = this;
 
     if (!id) {
@@ -184,7 +203,7 @@ FirebaseTransport.prototype.remove = function(id, band) {
     self.native.child(channel).remove();
 };
 
-/* -- internals -- */
+/* --- internals --- */
 FirebaseTransport.prototype._channel = function(id, band) {
     var self = this;
 

@@ -15,5 +15,11 @@ var p = new FirebaseTransport({
     prefix: "/samples/",
 });
 p.updated("MyThingID", "meta", function(id, band, value) {
-    console.log("+", id, band, value);
+    if (value === undefined) {
+        p.get(id, band, function(_id, _band, value) {
+            console.log("+", id, band, value);
+        });
+    } else {
+        console.log("+", id, band, value);
+    }
 });
