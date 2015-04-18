@@ -14,6 +14,6 @@ var FirebaseTransport = require('../FirebaseTransport').FirebaseTransport;
 var p = new FirebaseTransport({
     prefix: "/no-samples/",
 });
-p.list(function(ids) {
-    console.log(ids);
+p.list(function(d) {
+    console.log(d.id);
 });

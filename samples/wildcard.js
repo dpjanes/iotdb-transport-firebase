@@ -1,5 +1,5 @@
 /*
- *  receive.js
+ *  wildcard.js
  *
  *  David Janes
  *  IOTDB.org
@@ -14,9 +14,12 @@ var FirebaseTransport = require('../FirebaseTransport').FirebaseTransport;
 var p = new FirebaseTransport({
     prefix: "/samples/",
 });
-p.get("MyThingID", "meta", function(id, band, value) {
-    console.log("+", "get", id, band, value);
+p.get({
+    id: "MyThingID", 
+    band: "meta", 
+}, function(d) {
+    console.log("+", "get", d.id, d.band, d.value);
 });
-p.updated(function(id, band, value) {
-    console.log("+", "updated", id, band, value);
+p.updated(function(d) {
+    console.log("+", "updated", d.id, d.band, d.value);
 });

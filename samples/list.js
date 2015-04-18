@@ -15,6 +15,6 @@ var p = new FirebaseTransport({
     xprefix: "/samples/",
     prefix: "/76ca1468-7ebe-46d5-890f-315cb1ecf315/homestar/",
 });
-p.list(function(id) {
-    console.log(id);
+p.list(function(d) {
+    console.log(d.id);
 });

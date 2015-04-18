@@ -19,10 +19,14 @@ var _update = function() {
     var when = (new Date()).toISOString();
 
     console.log("+", "send", when);
-    p.update("MyThingID", "meta", {
-        first: "David",
-        last: "Janes",
-        now: when,
+    p.update({
+        id: "MyThingID", 
+        band: "meta", 
+        value: {
+            first: "David",
+            last: "Janes",
+            now: when,
+        },
     });
 };
 
