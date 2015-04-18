@@ -113,15 +113,23 @@ FirebaseTransport.prototype.get = function(id, band, callback) {
     if (!id) {
         throw new Error("id is required");
     }
-    if (!band) {
-        throw new Error("band is required");
-    }
 
-    var channel = self._channel(id, band);
-    self.native.child(channel).once("value", function(snapshot) {
-        // console.log("HERE:AAA", channel, id, band, snapshot.val(), snapshot);
-        callback(id, band, _unpack(snapshot.val()));
-    });
+    if (band === null) {
+        var channel = self._channel(id);
+        self.native.child(channel).once("value", function(snapshot) {
+            var keys = _.keys(snapshot.val());
+            keys = _.map(keys, _decode);
+
+            callback(id, band, {
+                bands: keys,
+            });
+        });
+    } else {
+        var channel = self._channel(id, band);
+        self.native.child(channel).once("value", function(snapshot) {
+            callback(id, band, _unpack(snapshot.val()));
+        });
+    }
 };
 
 /**
