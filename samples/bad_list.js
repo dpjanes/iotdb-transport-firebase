@@ -15,5 +15,8 @@ var p = new FirebaseTransport({
     prefix: "/no-samples/",
 });
 p.list(function(d) {
+    if (!d) {
+        return;
+    }
     console.log(d.id);
 });

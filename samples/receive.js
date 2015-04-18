@@ -19,10 +19,7 @@ transport.updated({
     band: "meta", 
 }, function(ud) {
     if (ud.value === undefined) {
-        transport.get({
-            id: ud.id, 
-            band: ud.band, 
-        }, function(gd) {
+        transport.get(ud, function(gd) {
             console.log("+", gd.id, gd.band, gd.value);
         });
     } else {
