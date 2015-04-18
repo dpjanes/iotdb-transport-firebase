@@ -108,6 +108,26 @@ FirebaseTransport.prototype.added = function(paramd, callback) {
 };
 
 /**
+ *  See {iotdb.transporter.Transport#about} for documentation.
+ */
+FirebaseTransport.prototype.about = function(paramd, callback) {
+    var self = this;
+
+    self._validate_about(paramd, callback);
+
+    var channel = self._channel(paramd.id);
+    self.native.child(channel).once("value", function(snapshot) {
+        var keys = _.keys(snapshot.val());
+        keys = _.map(keys, _decode);
+
+        callback({
+            id: paramd.id,
+            bands: keys,
+        });
+    });
+};
+
+/**
  *  See {iotdb.transporter.Transport#get} for documentation.
  */
 FirebaseTransport.prototype.get = function(paramd, callback) {
@@ -115,27 +135,14 @@ FirebaseTransport.prototype.get = function(paramd, callback) {
 
     self._validate_get(paramd, callback);
 
-    if (self.band === ".") {
-        var channel = self._channel(paramd.id);
-        self.native.child(channel).once("value", function(snapshot) {
-            var keys = _.keys(snapshot.val());
-            keys = _.map(keys, _decode);
-
-            callback({
-                id: paramd.id,
-                bands: keys,
-            });
+    var channel = self._channel(paramd.id, paramd.band);
+    self.native.child(channel).once("value", function(snapshot) {
+        callback({
+            id: paramd.id, 
+            band: paramd.band, 
+            value: _unpack(snapshot.val()),
         });
-    } else {
-        var channel = self._channel(paramd.id, paramd.band);
-        self.native.child(channel).once("value", function(snapshot) {
-            callback({
-                id: paramd.id, 
-                band: paramd.band, 
-                value: _unpack(snapshot.val()),
-            });
-        });
-    }
+    });
 };
 
 /**
