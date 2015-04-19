@@ -87,7 +87,9 @@ FirebaseTransport.prototype.list = function(paramd, callback) {
                     id: _decode(snapshot.key()),
                 });
             });
-            callback(null);
+            callback({
+                end: true
+            });
         });
 };
 

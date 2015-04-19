@@ -16,9 +16,9 @@ var p = new FirebaseTransport({
     prefix: "/76ca1468-7ebe-46d5-890f-315cb1ecf315/homestar/",
 });
 p.list(function(d) {
-    if (!d) {
+    if (d.end) {
         return;
     }
 
-    console.log(d.id);
+    console.log("+", d.id);
 });
