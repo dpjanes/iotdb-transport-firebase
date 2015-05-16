@@ -47,21 +47,30 @@ var _split;
 
 /**
  *  See {iotdb.transporter.Transport#Transport} for documentation.
+ *
+ *  @param {object} initd.firebase
+ *  pass in a Firebase object (great for sharing connections)
  */
 var FirebaseTransport = function (initd) {
     var self = this;
 
     self.initd = _.defaults(
         initd,
-        iotdb.keystore().get("/transports/FirebaseTransport/initd"), {
+        iotdb.keystore().get("/transports/FirebaseTransport/initd"),
+        {
             prefix: "/",
-            host: null
+            host: null,
+            firebase: null,
         }
     );
 
     self.initd.parts = _split(self.initd.prefix);
 
-    self.native = new firebase(self.initd.host);
+    if (self.initd.firebase) {
+        self.native = self.initd.firebase;
+    } else {
+        self.native = new firebase(self.initd.host);
+    }
 };
 
 FirebaseTransport.prototype = new iotdb.transporter.Transport();
@@ -162,7 +171,12 @@ FirebaseTransport.prototype.update = function (paramd, callback) {
     self._validate_update(paramd, callback);
 
     var channel = self._channel(paramd.id, paramd.band);
-    var d = _pack(paramd.value);
+    var d;
+    if (self.initd.add_timestamp) {
+        d = _pack(_.d.add_timestamp(paramd.value));
+    } else {
+        d = _pack(paramd.value);
+    }
 
     self.native.child(channel).set(d);
 
@@ -193,6 +207,10 @@ FirebaseTransport.prototype.updated = function (paramd, callback) {
         var snapshot_url = snapshot.ref().toString();
         var snapshot_path = url.parse(snapshot_url).path;
         var snapshot_parts = _split(snapshot_path);
+        for (var i in snapshot_parts) {
+            snapshot_parts[i] = _decode(snapshot_parts[i]); // once for Firebase
+            snapshot_parts[i] = _decode(snapshot_parts[i]); // once for IOTDB's encoding
+        }
         var snapshot_id;
         var snapshot_band;
         var snapshot_value;
@@ -200,8 +218,8 @@ FirebaseTransport.prototype.updated = function (paramd, callback) {
         var parts = self.initd.parts;
         var diff = snapshot_parts.length - parts.length;
         if (diff > 2) {
-            snapshot_id = _decode(snapshot_parts[parts.length]);
-            snapshot_band = _decode(snapshot_parts[parts.length + 1]);
+            snapshot_id = (snapshot_parts[parts.length]);
+            snapshot_band = (snapshot_parts[parts.length + 1]);
             snapshot_value = undefined;
             callback({
                 id: snapshot_id,
@@ -209,8 +227,8 @@ FirebaseTransport.prototype.updated = function (paramd, callback) {
                 value: snapshot_value,
             });
         } else if (diff === 2) {
-            snapshot_id = _decode(snapshot_parts[parts.length]);
-            snapshot_band = _decode(snapshot_parts[parts.length + 1]);
+            snapshot_id = (snapshot_parts[parts.length]);
+            snapshot_band = (snapshot_parts[parts.length + 1]);
             snapshot_value = _unpack(snapshot.val());
             callback({
                 id: snapshot_id,
@@ -218,7 +236,7 @@ FirebaseTransport.prototype.updated = function (paramd, callback) {
                 value: snapshot_value,
             });
         } else if (diff === 1) {
-            snapshot_id = _decode(snapshot_parts[parts.length]);
+            snapshot_id = (snapshot_parts[parts.length]);
             var d = _unpack(snapshot.val());
             for (snapshot_band in d) {
                 snapshot_value = d[snapshot_band];
