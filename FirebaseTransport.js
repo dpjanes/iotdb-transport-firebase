@@ -173,7 +173,7 @@ FirebaseTransport.prototype.update = function (paramd, callback) {
     var channel = self._channel(paramd.id, paramd.band);
     var d;
     if (self.initd.add_timestamp) {
-        d = _pack(_.d.add_timestamp(paramd.value));
+        d = _pack(_.timestamp.add(paramd.value));
     } else {
         d = _pack(paramd.value);
     }
