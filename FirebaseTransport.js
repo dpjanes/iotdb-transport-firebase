@@ -170,6 +170,16 @@ FirebaseTransport.prototype.update = function (paramd, callback) {
 
     self._validate_update(paramd, callback);
 
+    /* useful for debugging
+    if ((paramd.id === "urn:iotdb:thing:TCPConnected:D4A9280147D4:tcp-connected-light") && (paramd.band === "meta")) {
+        console.log("-----------");
+        console.log("id", paramd.id);
+        console.log("band", paramd.band);
+        console.log("value", paramd.value);
+        console.trace();
+    }
+     */
+
     var channel = self._channel(paramd.id, paramd.band);
     var d;
     if (self.initd.add_timestamp) {
