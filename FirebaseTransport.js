@@ -61,6 +61,7 @@ var FirebaseTransport = function (initd) {
             prefix: "/",
             host: null,
             firebase: null,
+            user: null,
         }
     );
 
@@ -100,10 +101,11 @@ FirebaseTransport.prototype.list = function (paramd, callback) {
             parent_snapshot.forEach(function (snapshot) {
                 return callback({
                     id: _decode(snapshot.key()),
+                    user: self.initd.user,
                 });
             });
             callback({
-                end: true
+                end: true,
             });
         });
 };
@@ -140,6 +142,7 @@ FirebaseTransport.prototype.about = function (paramd, callback) {
         callback({
             id: paramd.id,
             bands: keys,
+            user: self.initd.user,
         });
     });
 };
@@ -158,6 +161,7 @@ FirebaseTransport.prototype.get = function (paramd, callback) {
             id: paramd.id,
             band: paramd.band,
             value: _unpack(snapshot.val()),
+            user: self.initd.user,
         });
     });
 };
@@ -170,14 +174,15 @@ FirebaseTransport.prototype.update = function (paramd, callback) {
 
     self._validate_update(paramd, callback);
 
-    /* useful for debugging
-    if ((paramd.id === "urn:iotdb:thing:TCPConnected:D4A9280147D4:tcp-connected-light") && (paramd.band === "meta")) {
+    if ((paramd.id === "urn:iotdb:thing:Nest:A8U2EcjZj7E5Zty2zWKIa34FvE9u2uVE") && (paramd.band === "meta")) {
         console.log("-----------");
         console.log("id", paramd.id);
         console.log("band", paramd.band);
         console.log("value", paramd.value);
         console.trace();
+        process.exit(0)
     }
+    /* useful for debugging
      */
 
     var channel = self._channel(paramd.id, paramd.band);
@@ -195,6 +200,7 @@ FirebaseTransport.prototype.update = function (paramd, callback) {
             id: paramd.id,
             band: paramd.band,
             value: paramd.value,
+            user: self.initd.user,
         });
     }
 };
@@ -235,6 +241,7 @@ FirebaseTransport.prototype.updated = function (paramd, callback) {
                 id: snapshot_id,
                 band: snapshot_band,
                 value: snapshot_value,
+                user: self.initd.user,
             });
         } else if (diff === 2) {
             snapshot_id = (snapshot_parts[parts.length]);
@@ -244,6 +251,7 @@ FirebaseTransport.prototype.updated = function (paramd, callback) {
                 id: snapshot_id,
                 band: snapshot_band,
                 value: snapshot_value,
+                user: self.initd.user,
             });
         } else if (diff === 1) {
             snapshot_id = (snapshot_parts[parts.length]);
@@ -254,6 +262,7 @@ FirebaseTransport.prototype.updated = function (paramd, callback) {
                     id: snapshot_id,
                     band: snapshot_band,
                     value: snapshot_value,
+                    user: self.initd.user,
                 });
             }
         } else {
