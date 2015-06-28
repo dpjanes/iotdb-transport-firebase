@@ -66,6 +66,7 @@ var FirebaseTransport = function (initd) {
     );
 
     self.initd.parts = _split(self.initd.prefix);
+    self._ud = {};
 
     if (self.initd.firebase) {
         self.native = self.initd.firebase;
@@ -193,6 +194,12 @@ FirebaseTransport.prototype.update = function (paramd, callback) {
         d = _pack(paramd.value);
     }
 
+    var timestamp = d['@timestamp']
+    if (timestamp) {
+        var key = paramd.id + '@@@' + paramd.band
+        self._ud[key] = timestamp;
+    }
+
     self.native.child(channel).set(d);
 
     if (callback !== undefined) {
@@ -218,6 +225,22 @@ FirebaseTransport.prototype.updated = function (paramd, callback) {
 
     self._validate_updated(paramd, callback);
 
+    var _callback = function(paramd) {
+        var n_timestamp = paramd.value && paramd.value['@timestamp'];
+        if (n_timestamp) {
+            var key = paramd.id + '@@@' + paramd.band;
+            var o_timestamp = self._ud[key];
+            if (o_timestamp === n_timestamp) {
+                return;
+            }
+        }
+
+        callback(paramd);
+    };
+
+    /**
+     *  We should probably just listen to each individual thing. This is too expensive
+     */
     var channel = self._channel(paramd.id, paramd.band);
     self.native.child(channel).on("child_changed", function (snapshot, name) {
         var snapshot_url = snapshot.ref().toString();
@@ -237,7 +260,7 @@ FirebaseTransport.prototype.updated = function (paramd, callback) {
             snapshot_id = (snapshot_parts[parts.length]);
             snapshot_band = (snapshot_parts[parts.length + 1]);
             snapshot_value = undefined;
-            callback({
+            _callback({
                 id: snapshot_id,
                 band: snapshot_band,
                 value: snapshot_value,
@@ -247,7 +270,7 @@ FirebaseTransport.prototype.updated = function (paramd, callback) {
             snapshot_id = (snapshot_parts[parts.length]);
             snapshot_band = (snapshot_parts[parts.length + 1]);
             snapshot_value = _unpack(snapshot.val());
-            callback({
+            _callback({
                 id: snapshot_id,
                 band: snapshot_band,
                 value: snapshot_value,
@@ -258,7 +281,7 @@ FirebaseTransport.prototype.updated = function (paramd, callback) {
             var d = _unpack(snapshot.val());
             for (snapshot_band in d) {
                 snapshot_value = d[snapshot_band];
-                callback({
+                _callback({
                     id: snapshot_id,
                     band: snapshot_band,
                     value: snapshot_value,
