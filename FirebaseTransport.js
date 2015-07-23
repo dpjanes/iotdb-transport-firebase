@@ -23,6 +23,7 @@
 "use strict";
 
 var iotdb = require('iotdb');
+var iotdb_transport = require('iotdb-transport');
 var _ = iotdb._;
 var bunyan = iotdb.bunyan;
 
@@ -46,7 +47,7 @@ var _split;
 /* --- constructor --- */
 
 /**
- *  See {iotdb.transporter.Transport#Transport} for documentation.
+ *  See {iotdb_transport.Transport#Transport} for documentation.
  *
  *  @param {object} initd.firebase
  *  pass in a Firebase object (great for sharing connections)
@@ -75,10 +76,11 @@ var FirebaseTransport = function (initd) {
     }
 };
 
-FirebaseTransport.prototype = new iotdb.transporter.Transport();
+FirebaseTransport.prototype = new iotdb_transport.Transport();
+FirebaseTransport.prototype._class = "FirebaseTransport";
 
 /**
- *  See {iotdb.transporter.Transport#list} for documentation.
+ *  See {iotdb_transport.Transport#list} for documentation.
  *  <p>
  *  Note that this may not be memory efficient due
  *  to the way "value" works. This could be revisited
@@ -112,7 +114,7 @@ FirebaseTransport.prototype.list = function (paramd, callback) {
 };
 
 /**
- *  See {iotdb.transporter.Transport#added} for documentation.
+ *  See {iotdb_transport.Transport#added} for documentation.
  *  <p>
  *  NOT FINISHED
  */
@@ -128,7 +130,7 @@ FirebaseTransport.prototype.added = function (paramd, callback) {
 };
 
 /**
- *  See {iotdb.transporter.Transport#about} for documentation.
+ *  See {iotdb_transport.Transport#about} for documentation.
  */
 FirebaseTransport.prototype.about = function (paramd, callback) {
     var self = this;
@@ -149,7 +151,7 @@ FirebaseTransport.prototype.about = function (paramd, callback) {
 };
 
 /**
- *  See {iotdb.transporter.Transport#get} for documentation.
+ *  See {iotdb_transport.Transport#get} for documentation.
  */
 FirebaseTransport.prototype.get = function (paramd, callback) {
     var self = this;
@@ -168,7 +170,7 @@ FirebaseTransport.prototype.get = function (paramd, callback) {
 };
 
 /**
- *  See {iotdb.transporter.Transport#update} for documentation.
+ *  See {iotdb_transport.Transport#update} for documentation.
  */
 FirebaseTransport.prototype.update = function (paramd, callback) {
     var self = this;
@@ -213,7 +215,7 @@ FirebaseTransport.prototype.update = function (paramd, callback) {
 };
 
 /**
- *  See {iotdb.transporter.Transport#updated} for documentation.
+ *  See {iotdb_transport.Transport#updated} for documentation.
  */
 FirebaseTransport.prototype.updated = function (paramd, callback) {
     var self = this;
@@ -295,7 +297,7 @@ FirebaseTransport.prototype.updated = function (paramd, callback) {
 };
 
 /**
- *  See {iotdb.transporter.Transport#remove} for documentation.
+ *  See {iotdb_transport.Transport#remove} for documentation.
  */
 FirebaseTransport.prototype.remove = function (paramd, callback) {
     var self = this;
