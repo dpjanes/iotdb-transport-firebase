@@ -129,21 +129,26 @@ FirebaseTransport.prototype.added = function (paramd, callback) {
 };
 
 /**
- *  See {iotdb_transport.Transport#about} for documentation.
+ *  See {iotdb_transport.Transport#bands} for documentation.
  */
-FirebaseTransport.prototype.about = function (paramd, callback) {
+FirebaseTransport.prototype.bands = function (paramd, callback) {
     var self = this;
 
-    self._validate_about(paramd, callback);
+    self._validate_bands(paramd, callback);
 
     var channel = self._channel(paramd.id);
     self.native.child(channel).once("value", function (snapshot) {
         var keys = _.keys(snapshot.val());
         keys = _.map(keys, _decode);
 
+        bandd = {};
+        keys.map(key) {
+            bandd[key] = key;
+        });
+
         callback({
             id: paramd.id,
-            bands: keys,
+            bandd: bandd,
             user: self.initd.user,
         });
     });
