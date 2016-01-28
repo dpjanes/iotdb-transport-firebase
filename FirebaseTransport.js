@@ -171,7 +171,7 @@ FirebaseTransport.prototype.get = function (paramd, callback) {
 /**
  *  See {iotdb_transport.Transport#update} for documentation.
  */
-FirebaseTransport.prototype.update = function (paramd, callback) {
+FirebaseTransport.prototype.put = function (paramd, callback) {
     var self = this;
 
     self._validate_update(paramd, callback);
