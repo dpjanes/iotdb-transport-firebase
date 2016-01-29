@@ -17,8 +17,12 @@ var p = new FirebaseTransport({
 p.get({
     id: "MyThingID", 
     band: "meta", 
-}, function(d) {
-    console.log("+", "get", d.id, d.band, d.value);
+}, function(error, gd) {
+    if (error) {
+        console.log("#", error);
+        return;
+    }
+    console.log("+", "get", gd.id, gd.band, gd.value);
 });
 p.updated(function(d) {
     console.log("+", "updated", d.id, d.band, d.value);

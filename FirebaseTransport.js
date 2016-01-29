@@ -154,7 +154,7 @@ FirebaseTransport.prototype.get = function (paramd, callback) {
 
     var channel = self._channel(paramd.id, paramd.band);
     self.native.child(channel).once("value", function (snapshot) {
-        callback({
+        callback(null, {
             id: paramd.id,
             band: paramd.band,
             value: _unpack(snapshot.val()),
