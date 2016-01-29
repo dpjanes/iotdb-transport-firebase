@@ -198,14 +198,12 @@ FirebaseTransport.prototype.put = function (paramd, callback) {
 
     self.native.child(channel).set(d);
 
-    if (callback !== undefined) {
-        callback({
-            id: paramd.id,
-            band: paramd.band,
-            value: paramd.value,
-            user: self.initd.user,
-        });
-    }
+    callback(null, {
+        id: paramd.id,
+        band: paramd.band,
+        value: paramd.value,
+        user: self.initd.user,
+    });
 };
 
 /**
