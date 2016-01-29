@@ -214,17 +214,17 @@ FirebaseTransport.prototype.updated = function (paramd, callback) {
 
     self._validate_updated(paramd, callback);
 
-    var _callback = function(paramd) {
-        var n_timestamp = paramd.value && paramd.value['@timestamp'];
+    var _callback = function(cd) {
+        var n_timestamp = cd.value && cd.value['@timestamp'];
         if (n_timestamp) {
-            var key = paramd.id + '@@@' + paramd.band;
+            var key = cd.id + '@@@' + cd.band;
             var o_timestamp = self._ud[key];
             if (o_timestamp === n_timestamp) {
                 return;
             }
         }
 
-        callback(paramd);
+        callback(null, cd);
     };
 
     /**

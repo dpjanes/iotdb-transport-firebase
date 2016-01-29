@@ -24,6 +24,11 @@ p.get({
     }
     console.log("+", "get", gd.id, gd.band, gd.value);
 });
-p.updated(function(d) {
+p.updated(function(error, d) {
+    if (error) {
+        console.log("#", error);
+        return;
+    }
+
     console.log("+", "updated", d.id, d.band, d.value);
 });
