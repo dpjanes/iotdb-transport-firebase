@@ -96,14 +96,11 @@ FirebaseTransport.prototype.list = function (paramd, callback) {
         .orderByKey()
         .on("value", function (parent_snapshot) {
             parent_snapshot.forEach(function (snapshot) {
-                return callback({
-                    id: _decode(snapshot.key()),
-                    user: self.initd.user,
-                });
+                var ld = _.shallowCopy(paramd);
+                ld.id = _decode(snapshot.key());
+                return callback(null, ld);
             });
-            callback({
-                end: true,
-            });
+            callback(null, null);
         });
 };
 

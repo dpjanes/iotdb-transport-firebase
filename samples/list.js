@@ -15,10 +15,15 @@ var p = new FirebaseTransport({
     xprefix: "/samples/",
     prefix: "/76ca1468-7ebe-46d5-890f-315cb1ecf315/homestar/",
 });
-p.list(function(d) {
-    if (d.end) {
+p.list(function(error, ld) {
+    if (error) {
+        console.log("#", "error", error);
         return;
     }
+    if (!ld) {
+        console.log("+", "<end>");
+        break;
+    }
 
-    console.log("+", d.id);
+    console.log("+", ld.id);
 });
