@@ -136,7 +136,7 @@ FirebaseTransport.prototype.bands = function (paramd, callback) {
             bandd[key] = key;
         });
 
-        callback({
+        callback(null, {
             id: paramd.id,
             bandd: bandd,
             user: self.initd.user,
