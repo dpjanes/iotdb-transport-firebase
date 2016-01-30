@@ -96,7 +96,7 @@ FirebaseTransport.prototype.list = function (paramd, callback) {
         .orderByKey()
         .on("value", function (parent_snapshot) {
             parent_snapshot.forEach(function (snapshot) {
-                var ld = _.shallowCopy(paramd);
+                var ld = _.d.clone.shallow(paramd);
                 ld.id = _decode(snapshot.key());
                 return callback(null, ld);
             });
@@ -291,7 +291,7 @@ FirebaseTransport.prototype.remove = function (paramd, callback) {
     var channel = self._channel(paramd.id);
     self.native.child(channel).remove();
 
-    var rd = _.shallowCopy(paramd);
+    var rd = _.d.clone.shallow(paramd);
     delete rd.band;
     delete rd.value;
 
