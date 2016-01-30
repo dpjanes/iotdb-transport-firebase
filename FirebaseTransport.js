@@ -290,6 +290,12 @@ FirebaseTransport.prototype.remove = function (paramd, callback) {
 
     var channel = self._channel(paramd.id);
     self.native.child(channel).remove();
+
+    var rd = _.shallowCopy(paramd);
+    delete rd.band;
+    delete rd.value;
+
+    callback(null, rd);
 };
 
 /* --- internals --- */
