@@ -113,10 +113,10 @@ var _setup = function () {
         return;
     }
 
-    if (!iotdb.keystore().get("/enabled/transports/FirebaseTransport", false)) {
+    if (!iotdb.keystore().get("/enabled/homestar/FirebaseTransport", false)) {
         logger.error({
             method: "_transport_coap",
-            cause: "do $ homestar set --boolean /enabled/transports/FirebaseTransport false",
+            cause: "do $ homestar set --boolean /enabled/homestar/FirebaseTransport false",
         }, "Transporter not enabled");
         return;
     }
