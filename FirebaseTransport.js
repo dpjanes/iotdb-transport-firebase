@@ -56,8 +56,7 @@ var FirebaseTransport = function (initd) {
 
     self.initd = _.defaults(
         initd,
-        iotdb.keystore().get("/transports/FirebaseTransport/initd"),
-        {
+        iotdb.keystore().get("/transports/FirebaseTransport/initd"), {
             prefix: "/",
             host: null,
             firebase: null,
@@ -128,8 +127,8 @@ FirebaseTransport.prototype.bands = function (paramd, callback) {
         var keys = _.keys(snapshot.val());
         keys = _.map(keys, _decode);
 
-        bandd = {};
-        keys.map(key) {
+        var bandd = {};
+        keys.map(function (key) {
             bandd[key] = key;
         });
 
@@ -174,7 +173,7 @@ FirebaseTransport.prototype.put = function (paramd, callback) {
         console.log("band", paramd.band);
         console.log("value", paramd.value);
         console.trace();
-        process.exit(0)
+        process.exit(0);
     }
     /* useful for debugging
      */
@@ -187,9 +186,9 @@ FirebaseTransport.prototype.put = function (paramd, callback) {
         d = _pack(paramd.value);
     }
 
-    var timestamp = d['@timestamp']
+    var timestamp = d['@timestamp'];
     if (timestamp) {
-        var key = paramd.id + '@@@' + paramd.band
+        var key = paramd.id + '@@@' + paramd.band;
         self._ud[key] = timestamp;
     }
 
@@ -211,7 +210,7 @@ FirebaseTransport.prototype.updated = function (paramd, callback) {
 
     self._validate_updated(paramd, callback);
 
-    var _callback = function(cd) {
+    var _callback = function (cd) {
         var n_timestamp = cd.value && cd.value['@timestamp'];
         if (n_timestamp) {
             var key = cd.id + '@@@' + cd.band;
