@@ -166,4 +166,15 @@ var on_profile = function (locals, cfgd) {
 /*
  *  API
  */
-exports.on_profile = on_profile;
+module.exports = {
+    /**
+     *  Called when the profile is updated
+     */
+    on_profile: function (locals, profile) {
+        if (!profile.firebase) {
+            return;
+        }
+
+        firebase.on_profile(locals, profile.firebase);
+    },
+};

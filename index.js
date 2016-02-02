@@ -24,17 +24,4 @@
 
 exports.Transport = require('./FirebaseTransport').FirebaseTransport;
 
-var firebase = require('./firebase');
-
-exports.homestar = {
-    /**
-     *  Called when the profile is updated
-     */
-    on_profile: function (locals, profile) {
-        if (!profile.firebase) {
-            return;
-        }
-
-        firebase.on_profile(locals, profile.firebase);
-    },
-};
+exports.homestar = require('./homestar')
