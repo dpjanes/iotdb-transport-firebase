@@ -301,7 +301,7 @@ FirebaseTransport.prototype.remove = function (paramd, callback) {
 FirebaseTransport.prototype._channel = function (id, band) {
     var self = this;
 
-    var parts = _.deepCopy(self.initd.parts);
+    var parts = _.d.clone.deep(self.initd.parts);
     if (id) {
         parts.push(_encode(id));
 
