@@ -24,4 +24,9 @@
 
 exports.Transport = require('./FirebaseTransport').FirebaseTransport;
 
+const transporter = require('./transporter');
+exports.make = transporter.make;
+
+
+
 exports.homestar = require('./homestar')
