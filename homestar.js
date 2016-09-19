@@ -26,7 +26,7 @@
 
 var iotdb = require('iotdb');
 var iotdb_transport = require('iotdb-transport');
-var _ = iotdb.helpers;
+var _ = iotdb._;
 
 var firebase = require('firebase'); // NOTE: the real thing, not this module
 var FirebaseTransport = require('./FirebaseTransport').FirebaseTransport;

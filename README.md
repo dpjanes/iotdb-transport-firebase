@@ -1,24 +1,26 @@
 # iotdb-transport-firebase
-IOTDB / Home☆Star Transport for Firebase
+[IOTDB](https://github.com/dpjanes/node-iotdb) 
+[Transporter](https://github.com/dpjanes/node-iotdb/blob/master/docs/transporters.md)
+for
+[Firebase Realtime Database](https://firebase.google.com/docs/database/)
 
 <img src="https://raw.githubusercontent.com/dpjanes/iotdb-homestar/master/docs/HomeStar.png" align="right" />
 
-This is an **advanced** topic. 
-[Documentation](https://homestar.io/about/transporters).
+# About
 
-## Setting up
+* [Read more about Transporters](https://github.com/dpjanes/node-iotdb/blob/master/docs/transporters.md)
 
-### Add to IOTDB
+# Installation
 
-    homestar install iotdb-transport-firebase
+    $ npm install -g homestar ## may require sudi
+    $ npm install iotdb-transport-firebase
 
-### Add your FireBase account
+## Configuration
 
-    homestar set /transports/FirebaseTransport/initd/host 'https://yourname.firebaseIO.com/'
-
+    $ homestar set /transports/FirebaseTransport/initd/host 'https://yourname.firebaseIO.com/'
 
 ## Links
 
 * https://www.npmjs.com/package/firebase
-* https://www.firebase.com/docs/web/api/
+* https://firebase.google.com/docs/database/
 
