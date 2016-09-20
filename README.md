@@ -10,17 +10,20 @@ for
 
 * [Read more about Transporters](https://github.com/dpjanes/node-iotdb/blob/master/docs/transporters.md)
 
-# Installation
-
-    $ npm install -g homestar ## may require sudi
-    $ npm install iotdb-transport-firebase
-
-## Configuration
-
-    $ homestar set /transports/FirebaseTransport/initd/host 'https://yourname.firebaseIO.com/'
-
-## Links
+## Related Links
 
 * https://www.npmjs.com/package/firebase
 * https://firebase.google.com/docs/database/
 
+# Installation and Configuration
+
+## Install
+
+    $ npm install -g homestar ## may require sudi
+    $ npm install iotdb-transport-firebase
+
+## Configure
+
+    $ homestar set /transports/iotdb-transport-firebase/initd/host 'https://yourname.firebaseIO.com/'
+
+# Use
